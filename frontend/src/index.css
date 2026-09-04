@@ -1,84 +1,128 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import 'tailwindcss';
 
 @theme inline {
+  /* Colors */
+  --color-primary: #B08968;
+  --color-on-primary: #352720;
+  --color-primary-container: #876846;
+  --color-on-primary-container: #F3E9D7;
+  --color-secondary: #D6BFA6;
+  --color-on-secondary: #352720;
+  --color-secondary-container: #897b74;
+  --color-on-secondary-container: #F3E9D7;
+  --color-tertiary: #AF9675;
+  --color-on-tertiary: #352720;
+  --color-tertiary-container: #6D5239;
+  --color-on-tertiary-container: #F3E9D7;
+  --color-error: #a54343;
+  --color-on-error: #F3E9D7;
+  --color-error-container: #4a2525;
+  --color-on-error-container: #F3E9D7;
   --color-background: #352720;
-  --color-foreground: #F3E9D7;
-  --color-card: #3B2A22;
-  --color-card-foreground: #F3E9D7;
-  --color-primary: #7A553A;
-  --color-primary-foreground: #F3E9D7;
-  --color-secondary: #6D5239;
-  --color-secondary-foreground: #D6BFA6;
-  --color-muted: #3B2A22;
-  --color-muted-foreground: #AF9675;
-  --color-accent: #B08968;
-  --color-accent-foreground: #352720;
-  --color-border: #6D5239;
+  --color-on-background: #F3E9D7;
+  --color-surface: #3B2A22;
+  --color-on-surface: #F3E9D7;
+  --color-surface-variant: #45352c;
+  --color-on-surface-variant: #D6BFA6;
+  --color-outline: #897b74;
+  --color-outline-variant: #6D5239;
+  --color-shadow: #000000;
+  --color-scrim: #000000;
+  --color-inverse-surface: #F3E9D7;
+  --color-inverse-on-surface: #352720;
+  --color-inverse-primary: #7A553A;
+  --color-surface-dim: #2a1f19;
+  --color-surface-bright: #4c3a30;
+  --color-surface-container-lowest: #1f1612;
+  --color-surface-container-low: #2a1f19;
+  --color-surface-container: #352720;
+  --color-surface-container-high: #3B2A22;
+  --color-surface-container-highest: #45352c;
 
-  --font-sans: 'Inter', sans-serif;
-  --font-display: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Typography */
+  --font-display: 'Newsreader', serif;
+  --font-headline: 'Newsreader', serif;
+  --font-body: 'Geist', sans-serif;
+  --font-label: 'Geist', sans-serif;
+
+  /* Font Sizes */
+  --text-display-lg: 57px;
+  --text-display-lg--line-height: 64px;
+  --text-display-lg--letter-spacing: -0.02em;
+  
+  --text-display: 45px;
+  --text-display--line-height: 52px;
+  --text-display--letter-spacing: -0.015em;
+
+  --text-headline-lg: 40px;
+  --text-headline-lg--line-height: 48px;
+  --text-headline-lg--letter-spacing: -0.015em;
+
+  --text-headline-md: 28px;
+  --text-headline-md--line-height: 36px;
+
+  --text-headline-sm: 22px;
+  --text-headline-sm--line-height: 30px;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--letter-spacing: -0.005em;
+
+  --text-body-md: 15px;
+  --text-body-md--line-height: 24px;
+
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 20px;
+
+  --text-label-lg: 14px;
+  --text-label-lg--line-height: 20px;
+  --text-label-lg--letter-spacing: 0.02em;
+
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.04em;
+
+  --text-label-sm: 10px;
+  --text-label-sm--line-height: 14px;
+  --text-label-sm--letter-spacing: 0.08em;
+
+  /* Spacing */
+  --spacing-space-2xs: 0.25rem;
+  --spacing-space-xs: 0.5rem;
+  --spacing-space-sm: 0.75rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-space-xl: 2rem;
+  --spacing-space-2xl: 3rem;
+  --spacing-space-3xl: 4.5rem;
 }
 
-html,
-body,
-#root {
+html, body, #root {
   height: 100%;
   background-color: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans);
+  color: var(--color-on-background);
+  font-family: var(--font-body);
 }
 
-/* Subtle Dune / Desert Textures */
-.desert-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: -1;
-  background: radial-gradient(ellipse at bottom, #3B2A22 0%, #352720 100%);
+/* Base custom classes to match the design tokens that Tailwind doesn't auto-generate perfectly with font-size+line-height */
+.font-display { font-family: var(--font-display); }
+.font-headline { font-family: var(--font-headline); }
+.font-body { font-family: var(--font-body); }
+.font-label { font-family: var(--font-label); }
+
+.text-display-lg { font-size: var(--text-display-lg); line-height: var(--text-display-lg--line-height); letter-spacing: var(--text-display-lg--letter-spacing); }
+.text-display { font-size: var(--text-display); line-height: var(--text-display--line-height); letter-spacing: var(--text-display--letter-spacing); }
+.text-headline-lg { font-size: var(--text-headline-lg); line-height: var(--text-headline-lg--line-height); letter-spacing: var(--text-headline-lg--letter-spacing); }
+.text-headline-md { font-size: var(--text-headline-md); line-height: var(--text-headline-md--line-height); }
+.text-headline-sm { font-size: var(--text-headline-sm); line-height: var(--text-headline-sm--line-height); }
+.text-body-lg { font-size: var(--text-body-lg); line-height: var(--text-body-lg--line-height); letter-spacing: var(--text-body-lg--letter-spacing); }
+.text-body-md { font-size: var(--text-body-md); line-height: var(--text-body-md--line-height); }
+.text-body-sm { font-size: var(--text-body-sm); line-height: var(--text-body-sm--line-height); }
+.text-label-lg { font-size: var(--text-label-lg); line-height: var(--text-label-lg--line-height); letter-spacing: var(--text-label-lg--letter-spacing); }
+.text-label-md { font-size: var(--text-label-md); line-height: var(--text-label-md--line-height); letter-spacing: var(--text-label-md--letter-spacing); }
+.text-label-sm { font-size: var(--text-label-sm); line-height: var(--text-label-sm--line-height); letter-spacing: var(--text-label-sm--letter-spacing); }
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
 }
 
-.grain-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.15;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  z-index: 0;
-}
-
-@keyframes slow-pulse {
-  0%, 100% { opacity: 0.8; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.02); }
-}
-
-.sand-particle {
-  position: absolute;
-  background: #D6BFA6;
-  border-radius: 50%;
-  pointer-events: none;
-  animation: sand-drift linear infinite;
-  opacity: 0;
-}
-
-@keyframes sand-drift {
-  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
-  20% { opacity: 0.6; }
-  80% { opacity: 0.6; }
-  100% { transform: translate(-50px, -100px) scale(1.2); opacity: 0; }
-}
-
-/* Subtle Glows */
-.glow-warm {
-  box-shadow: 0 0 40px -10px rgba(176, 137, 104, 0.2);
-}
-.glow-warm-strong {
-  box-shadow: 0 0 60px -15px rgba(122, 85, 58, 0.4);
-}
