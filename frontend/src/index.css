@@ -1,23 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import 'tailwindcss';
 
 @theme inline {
-  --color-background: #15110E;
-  --color-foreground: #F4E8DB;
-  --color-card: #281D17;
-  --color-card-foreground: #F4E8DB;
-  --color-primary: #C56F43;
-  --color-primary-foreground: #FFFFFF;
-  --color-secondary: #3D2B20;
-  --color-secondary-foreground: #E1D4C2;
-  --color-muted: #281D17;
-  --color-muted-foreground: #BBA99B;
-  --color-accent: #EBAA62;
-  --color-accent-foreground: #15110E;
-  --color-border: #3D2B20;
+  --color-background: #352720;
+  --color-foreground: #F3E9D7;
+  --color-card: #3B2A22;
+  --color-card-foreground: #F3E9D7;
+  --color-primary: #7A553A;
+  --color-primary-foreground: #F3E9D7;
+  --color-secondary: #6D5239;
+  --color-secondary-foreground: #D6BFA6;
+  --color-muted: #3B2A22;
+  --color-muted-foreground: #AF9675;
+  --color-accent: #B08968;
+  --color-accent-foreground: #352720;
+  --color-border: #6D5239;
 
   --font-sans: 'Inter', sans-serif;
-  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
@@ -30,8 +30,8 @@ body,
   font-family: var(--font-sans);
 }
 
-/* Galaxy Motion Background */
-.galaxy-bg {
+/* Subtle Dune / Desert Textures */
+.desert-bg {
   position: absolute;
   top: 0;
   left: 0;
@@ -39,73 +39,46 @@ body,
   height: 100%;
   overflow: hidden;
   z-index: -1;
-  background: radial-gradient(ellipse at bottom, #281D17 0%, #15110E 100%);
+  background: radial-gradient(ellipse at bottom, #3B2A22 0%, #352720 100%);
 }
 
-.stars {
+.grain-overlay {
   position: absolute;
-  width: 2px;
-  height: 2px;
-  background: transparent;
-  animation: animStar 50s linear infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.15;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  z-index: 0;
 }
 
-@keyframes animStar {
-  from {
-    transform: translateY(0px);
-  }
-  to {
-    transform: translateY(-2000px);
-  }
+@keyframes slow-pulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
 }
 
-@keyframes orbital-spin {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.05); }
-  100% { transform: rotate(360deg) scale(1); }
+.sand-particle {
+  position: absolute;
+  background: #D6BFA6;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: sand-drift linear infinite;
+  opacity: 0;
 }
 
-@keyframes orbital-spin-reverse {
-  0% { transform: rotate(360deg) scale(1); }
-  50% { transform: rotate(180deg) scale(0.95); }
-  100% { transform: rotate(0deg) scale(1); }
+@keyframes sand-drift {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translate(-50px, -100px) scale(1.2); opacity: 0; }
 }
 
-@keyframes particle-float {
-  0% { transform: translateY(0) scale(1); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateY(-20px) scale(0); opacity: 0; }
+/* Subtle Glows */
+.glow-warm {
+  box-shadow: 0 0 40px -10px rgba(176, 137, 104, 0.2);
 }
-
-
-/* Logo Animations */
-.atom-spin {
-  transform-origin: 60px 40px;
-  animation: atom-spin 15s linear infinite;
-}
-.wave-float-1 {
-  animation: wave-float-1 4s ease-in-out infinite;
-}
-.wave-float-2 {
-  animation: wave-float-2 3.5s ease-in-out infinite alternate;
-}
-.wave-float-3 {
-  animation: wave-float-3 4.5s ease-in-out infinite alternate;
-}
-
-@keyframes atom-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-@keyframes wave-float-1 {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-3px); }
-}
-@keyframes wave-float-2 {
-  0%, 100% { transform: translateY(0px) translateX(0px); }
-  50% { transform: translateY(2px) translateX(-1px); }
-}
-@keyframes wave-float-3 {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-2px); }
+.glow-warm-strong {
+  box-shadow: 0 0 60px -15px rgba(122, 85, 58, 0.4);
 }

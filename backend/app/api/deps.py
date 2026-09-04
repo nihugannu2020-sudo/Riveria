@@ -1,32 +1,38 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import jwt
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt, JWTError
+from sqlalchemy.orm import Session
+
 from app.core.config import settings
+from app.core.database import get_db
+from app.models.user import User
+from app.schemas.user import TokenPayload
 
-security = HTTPBearer()
+reusable_oauth2 = OAuth2PasswordBearer(
+    tokenUrl="/api/auth/login"
+)
 
-def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """
-    Verifies the JWT token from Supabase.
-    In a real implementation, this would verify the signature against the Supabase JWT secret.
-    """
-    token = credentials.credentials
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing authentication token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
+def get_current_user(
+    db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
+) -> User:
     try:
         payload = jwt.decode(
-            token, 
-            settings.SUPABASE_JWT_SECRET, 
-            algorithms=["HS256"], 
-            audience="authenticated"
+            token, settings.JWT_SECRET, algorithms=[settings.ALGORITHM]
         )
-        return {"sub": payload.get("sub"), "role": payload.get("role", "authenticated")}
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
-    except jwt.PyJWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        token_data = TokenPayload(**payload)
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+        )
+    
+    user = db.query(User).filter(User.id == int(token_data.sub)).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+def get_current_active_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    # Later add active/inactive check if necessary
+    return current_user
