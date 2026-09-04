@@ -3,11 +3,15 @@ import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { getSession } from './api/auth';
 import type { Session } from '@supabase/supabase-js';
 
-// Import newly scaffolded pages
-import Dashboard from './pages/Dashboard';
-import Timetable from './pages/Timetable';
-import KnowledgeBase from './pages/KnowledgeBase';
-import Chat from './pages/Chat';
+// Import custom components
+import DesktopShell from './components/DesktopShell';
+
+// Import pages
+import LLMChat from './pages/LLMChat';
+import RAGChat from './pages/RAGChat';
+import Planner from './pages/Planner';
+import Resources from './pages/Resources';
+import Forum from './pages/Forum';
 import Login from './pages/Login';
 
 const AuthContext = createContext<{ session: Session | null; loading: boolean }>({ session: null, loading: true });
@@ -31,10 +35,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session, loading } = useAuth();
   
-  if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-background text-on-background">Loading...</div>;
+  if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-parchment text-indigo font-interface uppercase tracking-widest text-xs font-bold">Initializing System...</div>;
   if (!session) return <Navigate to="/login" replace />;
   
-  return <>{children}</>;
+  return <DesktopShell>{children}</DesktopShell>;
 };
 
 export default function App() {
@@ -42,30 +46,36 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/planner" replace />} />
           <Route path="/login" element={<Login />} />
           
-          <Route path="/dashboard" element={
+          <Route path="/planner" element={
             <ProtectedRoute>
-              <Dashboard />
+              <Planner />
             </ProtectedRoute>
           } />
           
-          <Route path="/timetable" element={
+          <Route path="/llm-chat" element={
             <ProtectedRoute>
-              <Timetable />
+              <LLMChat />
             </ProtectedRoute>
           } />
           
-          <Route path="/knowledge" element={
+          <Route path="/rag-chat" element={
             <ProtectedRoute>
-              <KnowledgeBase />
+              <RAGChat />
             </ProtectedRoute>
           } />
           
-          <Route path="/chat" element={
+          <Route path="/resources" element={
             <ProtectedRoute>
-              <Chat />
+              <Resources />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/forum" element={
+            <ProtectedRoute>
+              <Forum />
             </ProtectedRoute>
           } />
           

@@ -1,23 +1,26 @@
-import { supabase } from './supabase';
-
+// Bypassing Supabase for local development access
 export const loginWithGoogle = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-  });
-  if (error) {
-    console.error('Error logging in with Google:', error);
-  }
-  return { data, error };
+  return { 
+    data: { 
+      session: { 
+        access_token: 'dummy',
+        user: { id: 'dummy', user_metadata: { full_name: 'Paul Atreides' } }
+      }
+    }, 
+    error: null 
+  };
 };
 
 export const logout = async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    console.error('Error logging out:', error);
-  }
+  return { error: null };
 };
 
 export const getSession = async () => {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  return { session, error };
+  return { 
+    session: { 
+      access_token: 'dummy',
+      user: { id: 'dummy', user_metadata: { full_name: 'Paul Atreides' } }
+    }, 
+    error: null 
+  };
 };
