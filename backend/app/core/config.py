@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-2.5-flash"
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "llama3-8b-8192"
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_MODEL: str = "meta-llama/llama-3.1-8b-instruct:free"
 
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True, extra="ignore")
 

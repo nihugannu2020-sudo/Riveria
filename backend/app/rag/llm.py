@@ -58,6 +58,38 @@ class GroqProvider(LLMProvider):
             data = response.json()
             return data["choices"][0]["message"]["content"]
 
+class OpenRouterProvider(LLMProvider):
+    def __init__(self):
+        self.api_key = settings.OPENROUTER_API_KEY
+        self.model_name = settings.OPENROUTER_MODEL
+        self.url = "https://openrouter.ai/api/v1/chat/completions"
+
+    async def generate_response(self, prompt: str, context: str) -> str:
+        if not self.api_key:
+            return "OpenRouter API key not configured."
+            
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "http://localhost:8000",
+            "X-Title": "RoenRiviera"
+        }
+        
+        payload = {
+            "model": self.model_name,
+            "messages": [
+                {"role": "system", "content": f"You are a helpful assistant answering based on this context: {context}"},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.0
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(self.url, headers=headers, json=payload)
+            response.raise_for_status()
+            data = response.json()
+            return data["choices"][0]["message"]["content"]
+
 async def generate_rag_response(prompt: str, context: str) -> str:
     """Primary LLM pipeline with fallback support."""
     primary_provider = settings.LLM_PROVIDER.lower()
@@ -73,15 +105,15 @@ async def generate_rag_response(prompt: str, context: str) -> str:
             return "Invalid LLM provider configured."
     except Exception as e:
         if settings.LLM_FALLBACK_ENABLED:
-            print(f"Primary LLM failed: {e}. Falling back...")
+            print(f"Primary LLM failed: {e}. Falling back to OpenRouter...")
             try:
-                # If Gemini failed, try Groq
+                # If Gemini failed, try OpenRouter fallback
                 if primary_provider == "gemini":
-                    fallback = GroqProvider()
+                    fallback = OpenRouterProvider()
                     return await fallback.generate_response(prompt, context)
-                # If Groq failed, try Gemini
+                # If Groq failed, try OpenRouter
                 elif primary_provider == "groq":
-                    fallback = GeminiProvider()
+                    fallback = OpenRouterProvider()
                     return await fallback.generate_response(prompt, context)
             except Exception as fallback_e:
                 print(f"Fallback LLM also failed: {fallback_e}")
