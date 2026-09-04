@@ -2,7 +2,7 @@ from app.schemas.chat import ChatRequest, ChatResponse, ChatMetadata
 from app.rag.llm import generate_rag_response
 from app.rag.grounding import check_evidence_sufficiency, map_citations
 
-async def execute_campus_faq(request: ChatRequest, conv_id: str) -> ChatResponse:
+async def execute_campus_faq(request: ChatRequest, conv_id: str, user_id: str) -> ChatResponse:
     # 1. Retrieve evidence (Mocked for now)
     # FAQ usually has rich metadata filtering (e.g., source_type="official")
     mock_retrieved_chunks = [
@@ -21,7 +21,8 @@ async def execute_campus_faq(request: ChatRequest, conv_id: str) -> ChatResponse
         )
         
     context = "\n".join([chunk["content"] for chunk in mock_retrieved_chunks])
-    llm_answer = await generate_rag_response(request.message, context)
+    llm_result = await generate_rag_response(request.message, context)
+    llm_answer = llm_result["answer"]
     is_grounded, sources = map_citations(llm_answer, mock_retrieved_chunks)
 
     return ChatResponse(
@@ -31,5 +32,10 @@ async def execute_campus_faq(request: ChatRequest, conv_id: str) -> ChatResponse
         grounded=is_grounded,
         confidence="high",
         sources=sources,
-        metadata=ChatMetadata(retrieval_count=len(mock_retrieved_chunks), latency_ms=100)
+        metadata=ChatMetadata(
+            retrieval_count=len(mock_retrieved_chunks), 
+            latency_ms=100,
+            provider=llm_result["provider"],
+            fallback_used=llm_result["fallback_used"]
+        )
     )

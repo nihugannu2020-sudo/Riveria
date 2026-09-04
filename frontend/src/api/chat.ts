@@ -1,13 +1,24 @@
+import { getSession } from './auth';
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
 
 export const sendMessage = async (message: string, workflow: string) => {
   console.log(`Sending to backend [${workflow}]:`, message);
   try {
+    const { session } = await getSession();
+    const token = session?.access_token;
+    
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_URL}/chat/`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         message,
         workflow,

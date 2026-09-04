@@ -16,10 +16,11 @@ class GeminiProvider(LLMProvider):
 
     async def generate_response(self, prompt: str, context: str) -> str:
         if not settings.GEMINI_API_KEY:
-            return "Gemini API key not configured."
+            raise ValueError("Gemini API key not configured.")
         
         full_prompt = f"Context:\n{context}\n\nUser Query:\n{prompt}"
-        response = self.client.models.generate_content(
+        # Using the async client to avoid blocking the event loop
+        response = await self.client.aio.models.generate_content(
             model=self.model_name,
             contents=full_prompt,
             config=types.GenerateContentConfig(
@@ -36,7 +37,7 @@ class GroqProvider(LLMProvider):
 
     async def generate_response(self, prompt: str, context: str) -> str:
         if not self.api_key:
-            return "Groq API key not configured."
+            raise ValueError("Groq API key not configured.")
             
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -52,39 +53,44 @@ class GroqProvider(LLMProvider):
             "temperature": 0.0
         }
         
-        async with httpx.AsyncClient() as client:
+        # Add a timeout
+        timeout = httpx.Timeout(15.0)
+        async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(self.url, headers=headers, json=payload)
             response.raise_for_status()
             data = response.json()
             return data["choices"][0]["message"]["content"]
 
-async def generate_rag_response(prompt: str, context: str) -> str:
+async def generate_rag_response(prompt: str, context: str) -> Dict[str, Any]:
     """Primary LLM pipeline with fallback support."""
     primary_provider = settings.LLM_PROVIDER.lower()
     
     try:
         if primary_provider == "gemini":
             provider = GeminiProvider()
-            return await provider.generate_response(prompt, context)
+            answer = await provider.generate_response(prompt, context)
+            return {"answer": answer, "provider": "gemini", "fallback_used": False}
         elif primary_provider == "groq":
             provider = GroqProvider()
-            return await provider.generate_response(prompt, context)
+            answer = await provider.generate_response(prompt, context)
+            return {"answer": answer, "provider": "groq", "fallback_used": False}
         else:
-            return "Invalid LLM provider configured."
+            return {"answer": "Invalid LLM provider configured.", "provider": "none", "fallback_used": False}
     except Exception as e:
         if settings.LLM_FALLBACK_ENABLED:
-            print(f"Primary LLM failed: {e}. Falling back...")
+            import logging
+            logging.warning(f"Primary LLM ({primary_provider}) failed: {e}. Falling back...")
             try:
-                # If Gemini failed, try Groq
                 if primary_provider == "gemini":
                     fallback = GroqProvider()
-                    return await fallback.generate_response(prompt, context)
-                # If Groq failed, try Gemini
+                    answer = await fallback.generate_response(prompt, context)
+                    return {"answer": answer, "provider": "groq", "fallback_used": True}
                 elif primary_provider == "groq":
                     fallback = GeminiProvider()
-                    return await fallback.generate_response(prompt, context)
+                    answer = await fallback.generate_response(prompt, context)
+                    return {"answer": answer, "provider": "gemini", "fallback_used": True}
             except Exception as fallback_e:
-                print(f"Fallback LLM also failed: {fallback_e}")
-                return "Service temporarily unavailable due to upstream LLM errors."
+                logging.error(f"Fallback LLM also failed: {fallback_e}")
+                return {"answer": "Service temporarily unavailable due to upstream LLM errors.", "provider": "none", "fallback_used": True}
         
-        return "Service temporarily unavailable."
+        return {"answer": "Service temporarily unavailable.", "provider": "none", "fallback_used": False}

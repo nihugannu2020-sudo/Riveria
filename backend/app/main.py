@@ -12,10 +12,11 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-# Secure CORS Policy (No wildcards in production)
 ALLOWED_ORIGINS = [
     "http://localhost:5173", # Local Vite Dev Server
     "http://127.0.0.1:5173",
+    "http://localhost:8443",
+    "http://127.0.0.1:8443",
     "https://dot-thorn-30396890.figma.site" # From user's preview link
 ]
 

@@ -7,6 +7,6 @@ router = APIRouter()
 
 @router.post("/", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest, current_user: dict = Depends(verify_token)):
-    # The current_user contains the JWT payload
-    response = await route_workflow(request)
+    user_id = current_user.get("sub")
+    response = await route_workflow(request, user_id)
     return response

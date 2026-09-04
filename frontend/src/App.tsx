@@ -1,7 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState, createContext, useContext } from 'react';
+import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Bot, Library, Calendar, ArrowRight, Clock, CheckCircle2, Mic, X, Search, FileText, Upload, Settings } from 'lucide-react';
+import { loginWithGoogle, logout, getSession } from './api/auth';
+import type { Session } from '@supabase/supabase-js';
 
+const AuthContext = createContext<{ session: Session | null; loading: boolean }>({ session: null, loading: true });
+
+export const useAuth = () => useContext(AuthContext);
+
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getSession().then(({ session }) => {
+      setSession(session);
+      setLoading(false);
+    });
+  }, []);
+
+  return <AuthContext.Provider value={{ session, loading }}>{children}</AuthContext.Provider>;
+};
 const RoenLogo = ({ className = "h-8 w-auto" }: { className?: string }) => (
   <svg viewBox="0 0 160 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -171,7 +190,7 @@ const LandingPage = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="px-5 py-2 rounded-full border border-border/80 bg-background/50 text-sm font-medium text-white hover:bg-white/10 transition-colors">Log In</button>
+          <AuthButtons />
         </div>
       </nav>
 
@@ -595,7 +614,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           </div>
           <div className="flex items-center gap-4">
              <Settings size={18} className="text-muted-foreground hover:text-white cursor-pointer" />
-             <div className="w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center text-xs font-medium text-white">RR</div>
+             <AuthAvatar />
           </div>
         </div>
       )}
@@ -608,19 +627,52 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+const AuthButtons = () => {
+  const { session, loading } = useAuth();
+  
+  if (loading) return <div className="text-sm text-muted-foreground">Loading...</div>;
+  
+  if (session) {
+    return (
+      <button onClick={() => logout().then(() => window.location.reload())} className="px-5 py-2 rounded-full border border-border/80 bg-background/50 text-sm font-medium text-white hover:bg-white/10 transition-colors">
+        Log Out
+      </button>
+    );
+  }
+  
+  return (
+    <button onClick={() => loginWithGoogle()} className="px-5 py-2 rounded-full border border-border/80 bg-background/50 text-sm font-medium text-white hover:bg-white/10 transition-colors">
+      Log In
+    </button>
+  );
+};
+
+const AuthAvatar = () => {
+  const { session } = useAuth();
+  const initial = session?.user?.email?.[0].toUpperCase() || 'RR';
+  
+  return (
+    <div className="w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center text-xs font-medium text-white">
+      {initial}
+    </div>
+  );
+};
+
 function App() {
   return (
-    <BrowserRouter>
-      <AppShell>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/knowledge" element={<KnowledgeBase />} />
-          <Route path="/timetable" element={<Timetable />} />
-        </Routes>
-      </AppShell>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppShell>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/knowledge" element={<KnowledgeBase />} />
+            <Route path="/timetable" element={<Timetable />} />
+          </Routes>
+        </AppShell>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
