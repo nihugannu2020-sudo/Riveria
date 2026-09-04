@@ -1,31 +1,48 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-import os
-
+from fastapi.responses import JSONResponse
 from app.core.config import settings
+from app.core.rate_limit import RateLimitMiddleware
+from app.core.security_headers import SecurityHeadersMiddleware
+from app.core.payload_limit import PayloadSizeLimitMiddleware
+from app.api import api_v1
 
-app = FastAPI(title=settings.PROJECT_NAME)
-
-# CORS configuration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # In production, specify frontend URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-from app.api.auth import router as auth_router
-from app.api.resources import router as resources_router
-from app.api.timetable import router as timetable_router
+# Secure CORS Policy (No wildcards in production)
+ALLOWED_ORIGINS = [
+    "http://localhost:5173", # Local Vite Dev Server
+    "http://127.0.0.1:5173",
+    "https://dot-thorn-30396890.figma.site" # From user's preview link
+]
 
-# Ensure upload directory exists
-os.makedirs(settings.STORAGE_URL, exist_ok=True)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
+)
 
-app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
-app.include_router(resources_router, prefix="/api/resources", tags=["resources"])
-app.include_router(timetable_router, prefix="/api/timetable", tags=["timetable"])
+# Apply custom OWASP middlewares (Applied in reverse order of execution)
+app.add_middleware(RateLimitMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(PayloadSizeLimitMiddleware, max_size=500_000) # 500 KB limit for chat
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to RoenRiviera API"}
+# Global Exception Handler (Prevent info leakage)
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    print(f"Unhandled Exception: {exc}") # Log internally
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "An unexpected error occurred. Please try again later."},
+    )
+
+app.include_router(api_v1.api_router, prefix=settings.API_V1_STR)
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
