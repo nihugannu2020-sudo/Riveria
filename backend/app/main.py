@@ -6,6 +6,10 @@ from app.core.rate_limit import RateLimitMiddleware
 from app.core.security_headers import SecurityHeadersMiddleware
 from app.core.payload_limit import PayloadSizeLimitMiddleware
 from app.api import api_v1
+from app.db.database import engine, Base
+
+# Create tables (SQLite fallback or Postgres)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

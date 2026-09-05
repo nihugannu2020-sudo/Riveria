@@ -10,7 +10,7 @@ export default function Login() {
   const { session } = useAuth();
   
   if (session) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/planner" replace />;
   }
 
   return (

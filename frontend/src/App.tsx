@@ -1,7 +1,6 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { getSession } from './api/auth';
-import type { Session } from '@supabase/supabase-js';
 
 // Import custom components
 import DesktopShell from './components/DesktopShell';
@@ -14,6 +13,9 @@ import Resources from './pages/Resources';
 import Forum from './pages/Forum';
 import Login from './pages/Login';
 
+// Define a stub session type since we are removing Supabase
+type Session = { access_token: string; user: { id: string } };
+
 const AuthContext = createContext<{ session: Session | null; loading: boolean }>({ session: null, loading: true });
 export const useAuth = () => useContext(AuthContext);
 
@@ -23,7 +25,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     getSession().then(({ session }) => {
-      setSession(session);
+      setSession(session as Session | null);
       setLoading(false);
     });
   }, []);

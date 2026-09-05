@@ -56,7 +56,7 @@ export default function RAGChat() {
     setUploading(true);
     try {
       await uploadFile(selected, 'pdf');
-      setMessages(prev => [...prev, { role: 'assistant', content: `Success: I have successfully uploaded ${selected.name} to the vector space and your resources DB. You can now ask me questions about it.` }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: `Success: I have successfully uploaded ${selected.name} and indexed it in the vector space. You can now ask me questions about it.` }]);
     } catch (error) {
       console.error(error);
       setMessages(prev => [...prev, { role: 'assistant', content: `Error: Failed to upload ${selected.name}.` }]);

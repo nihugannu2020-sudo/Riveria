@@ -6,12 +6,22 @@ def check_evidence_sufficiency(query: str, retrieved_chunks: List[Dict[str, Any]
     Checks if the retrieved chunks likely contain enough information to answer the query.
     This prevents the LLM from hallucinating when no relevant data is found.
     """
-    if not retrieved_chunks:
+    if not query or not retrieved_chunks:
         return False
         
-    # In a real implementation, we could use a fast cross-encoder or check similarity scores.
-    # For now, we enforce that at least one chunk was retrieved with a decent similarity.
-    return True
+    # Basic lexical check: does the answer share substantive vocabulary with the context?
+    # retrieved_chunks might be passed as a single context string in our new implementation
+    context_text = retrieved_chunks if isinstance(retrieved_chunks, str) else " ".join([str(c) for c in retrieved_chunks])
+    
+    # Simple overlap check for words > 4 chars
+    answer_words = set(w.lower() for w in query.split() if len(w) > 4)
+    if not answer_words:
+        return True # Trivial answer
+        
+    context_lower = context_text.lower()
+    matches = sum(1 for w in answer_words if w in context_lower)
+    
+    return matches > 0 # Grounded if at least one substantive word matches
 
 def validate_claim_against_evidence(claim: str, retrieved_chunks: List[Dict[str, Any]]) -> bool:
     """
