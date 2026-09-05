@@ -14,7 +14,7 @@ export default function RetroInput({
   id,
   ...props
 }: RetroInputProps) {
-  const inputId = id || label.toLowerCase().replace(/\s+/g, '-');
+  const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : 'retro-input');
   
   return (
     <div className={`flex flex-col gap-1 ${fullWidth ? 'w-full' : 'w-auto'} ${className}`}>

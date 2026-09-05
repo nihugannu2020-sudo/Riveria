@@ -5,8 +5,12 @@ from app.api.deps import verify_token
 
 router = APIRouter()
 
-@router.post("/", response_model=ChatResponse)
-async def chat_endpoint(request: ChatRequest, current_user: dict = Depends(verify_token)):
-    # The current_user contains the JWT payload
-    response = await route_workflow(request)
-    return response
+@router.post("/river", response_model=ChatResponse)
+async def river_endpoint(request: ChatRequest, current_user: dict = Depends(verify_token)):
+    request.workflow = "river"
+    return await route_workflow(request, current_user)
+
+@router.post("/oasis", response_model=ChatResponse)
+async def oasis_endpoint(request: ChatRequest, current_user: dict = Depends(verify_token)):
+    request.workflow = "oasis"
+    return await route_workflow(request, current_user)

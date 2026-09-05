@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     # Supabase
     SUPABASE_URL: str = ""
     SUPABASE_SERVICE_ROLE_KEY: str = ""
+    SUPABASE_JWT_SECRET: str = ""
+    DATABASE_URL: str = ""
     
     # LLM Providers
     LLM_PROVIDER: str = "gemini" # gemini or groq
@@ -17,7 +19,20 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "llama3-8b-8192"
     OPENROUTER_API_KEY: str = ""
-    OPENROUTER_MODEL: str = "meta-llama/llama-3.1-8b-instruct:free"
+    OPENROUTER_MODEL: str = "meta-llama/llama-3.1-8b-instruct"
+
+    # Rate Limiting
+    REDIS_URL: str = "redis://localhost:6379/0"
+    RATE_LIMIT_LOGIN: str = "5/minute"
+    RATE_LIMIT_REGISTER: str = "3/minute"
+    RATE_LIMIT_PASSWORD_RESET: str = "3/minute"
+    RATE_LIMIT_API: str = "60/minute"
+    RATE_LIMIT_AI_RIVER: str = "10/minute"
+    RATE_LIMIT_AI_OASIS: str = "10/minute"
+    RATE_LIMIT_PLANNER: str = "5/minute"
+    RATE_LIMIT_UPLOAD: str = "5/minute"
+    RATE_LIMIT_YOUTUBE: str = "5/minute"
+    RATE_LIMIT_INDEXING: str = "2/minute"
 
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True, extra="ignore")
 

@@ -16,6 +16,8 @@ app = FastAPI(
 ALLOWED_ORIGINS = [
     "http://localhost:5173", # Local Vite Dev Server
     "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
     "https://dot-thorn-30396890.figma.site" # From user's preview link
 ]
 

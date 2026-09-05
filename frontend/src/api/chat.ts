@@ -16,7 +16,8 @@ export const sendMessage = async (message: string, workflow: string) => {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_URL}/chat/`, {
+    const endpoint = workflow === "river" ? "river" : (workflow === "oasis" ? "oasis" : "");
+    const response = await fetch(`${API_URL}/chat/${endpoint}`, {
       method: "POST",
       headers,
       body: JSON.stringify({
