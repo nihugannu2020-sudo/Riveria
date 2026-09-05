@@ -32,7 +32,7 @@ app.add_middleware(
 # Apply custom OWASP middlewares (Applied in reverse order of execution)
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
-app.add_middleware(PayloadSizeLimitMiddleware, max_size=500_000) # 500 KB limit for chat
+app.add_middleware(PayloadSizeLimitMiddleware, max_size=10_000_000) # 10 MB limit for file uploads
 
 # Global Exception Handler (Prevent info leakage)
 @app.exception_handler(Exception)

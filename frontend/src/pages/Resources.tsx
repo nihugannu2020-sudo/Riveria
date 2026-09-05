@@ -9,6 +9,8 @@ export default function Resources() {
   const timetableInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState<{name: string; type: string}[]>([]);
+  const [filterCategory, setFilterCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchResources();
@@ -86,43 +88,62 @@ export default function Resources() {
           <RetroInput 
             label="Search Pattern" 
             placeholder="Search all resources..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             fullWidth 
           />
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <span className="font-marker text-lg text-indigo mr-2">Categories:</span>
-            <button className="border-b-2 border-rust text-rust px-3 py-1 font-handwriting text-2xl font-bold">
-              All
-            </button>
-            <button className="text-indigo/60 px-3 py-1 font-handwriting text-2xl hover:text-indigo transition-colors">
-              Notes
-            </button>
-            <button className="text-indigo/60 px-3 py-1 font-handwriting text-2xl hover:text-indigo transition-colors">
-              Timetables
-            </button>
-            <button className="text-indigo/60 px-3 py-1 font-handwriting text-2xl hover:text-indigo transition-colors">
-              Question Banks
-            </button>
+            {['All', 'Notes', 'Timetables', 'Question Banks'].map(cat => (
+              <button 
+                key={cat}
+                onClick={() => setFilterCategory(cat)}
+                className={`px-3 py-1 font-handwriting text-2xl transition-colors ${
+                  filterCategory === cat 
+                    ? 'border-b-2 border-rust text-rust font-bold' 
+                    : 'text-indigo/60 hover:text-indigo'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
       </ScrapbookPanel>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        {files.length === 0 ? (
-          <div className="col-span-full py-12 flex flex-col items-center justify-center text-indigo/50">
-            <p className="font-handwriting text-3xl rotate-2">Repository is empty.</p>
-          </div>
-        ) : (
-          files.map((f, i) => (
+        {(() => {
+          const filteredFiles = files.filter(f => {
+            if (searchQuery && !f.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+            
+            const fileType = (f.type || '').toLowerCase();
+            if (filterCategory === 'Notes' && fileType !== 'pdf') return false;
+            if (filterCategory === 'Timetables' && fileType !== 'timetable') return false;
+            if (filterCategory === 'Question Banks' && fileType !== 'question_bank') return false;
+            return true;
+          });
+
+          if (filteredFiles.length === 0) {
+            return (
+              <div className="col-span-full py-12 flex flex-col items-center justify-center text-indigo/50">
+                <p className="font-handwriting text-3xl rotate-2">Repository is empty.</p>
+              </div>
+            );
+          }
+
+          return filteredFiles.map((f, i) => (
              <ScrapbookPanel key={i} title={f.name} tapePosition="top" rotation={i % 2 === 0 ? 1 : -1}>
                 <div className="p-4 text-center">
                   <span className="material-symbols-outlined text-[48px] text-indigo/30 mb-4">
-                    {f.type === "Timetable" ? "calendar_view_week" : "description"}
+                    {(f.type || '').toLowerCase() === "timetable" ? "calendar_view_week" : "description"}
                   </span>
-                  <p className="font-interface text-[10px] uppercase tracking-widest text-rust">{f.type}</p>
+                  <p className="font-interface text-[10px] uppercase tracking-widest text-rust">
+                    {(f.type || '').toLowerCase() === "pdf" ? "Document" : f.type}
+                  </p>
                 </div>
              </ScrapbookPanel>
-          ))
-        )}
+          ));
+        })()}
       </div>
     </div>
   );

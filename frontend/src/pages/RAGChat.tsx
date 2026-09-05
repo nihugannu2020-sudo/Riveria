@@ -3,6 +3,7 @@ import ScrapbookPanel from '../components/ScrapbookPanel';
 import RetroInput from '../components/RetroInput';
 import RetroButton from '../components/RetroButton';
 import { sendMessage } from '../api/chat';
+import { uploadFile } from '../api/ingest';
 
 interface SourceItem {
   document_name: string;
@@ -19,7 +20,9 @@ export default function RAGChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -46,6 +49,26 @@ export default function RAGChat() {
     }
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+
+    setUploading(true);
+    try {
+      await uploadFile(selected, 'pdf');
+      setMessages(prev => [...prev, { role: 'assistant', content: `Success: I have successfully uploaded ${selected.name} to the vector space and your resources DB. You can now ask me questions about it.` }]);
+    } catch (error) {
+      console.error(error);
+      setMessages(prev => [...prev, { role: 'assistant', content: `Error: Failed to upload ${selected.name}.` }]);
+    } finally {
+      setUploading(false);
+      // clear the input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)] md:h-[calc(100vh-4rem)]">
       {/* Header */}
@@ -67,35 +90,14 @@ export default function RAGChat() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
-        {/* Left Side: Context / Document Upload */}
-        <div className="lg:w-5/12 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
-          <ScrapbookPanel title="Knowledge Context" tapePosition="top-left" rotation={-1}>
-            <div className="flex flex-col gap-4">
-              <div className="border-2 border-dashed border-indigo/40 bg-sand p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-sand/80 transition-colors h-48 scrapbook-shadow">
-                <span className="material-symbols-outlined text-[32px] text-indigo/60 mb-2">attach_file</span>
-                <span className="font-marker text-xl text-indigo font-bold">Pin a Document</span>
-                <span className="font-handwriting text-xl text-indigo/60 mt-2">PDF, TXT, MD</span>
-              </div>
-              
-              <div className="bg-parchment p-4 scrapbook-border">
-                <h3 className="font-marker text-lg text-indigo font-bold mb-3 border-b-2 border-dashed border-indigo/20 pb-2">Pinned Files / Web Search</h3>
-                <div className="text-center font-handwriting text-2xl text-indigo/50 py-4 rotate-[1deg]">
-                  Nothing pinned yet! But I can search the web for answers.
-                </div>
-              </div>
-            </div>
-          </ScrapbookPanel>
-        </div>
-
-        {/* Right Side: Chat Interface */}
-        <div className="lg:w-7/12 flex flex-col min-h-0 h-full">
-          <ScrapbookPanel title="Oasis Chat" tapePosition="top-right" rotation={1} className="flex-1 flex flex-col h-full">
+      <div className="flex flex-col gap-6 flex-1 min-h-0">
+        <div className="flex flex-col min-h-0 h-full">
+          <ScrapbookPanel title="Oasis Chat" tapePosition="top" rotation={0} className="flex-1 flex flex-col h-full max-w-5xl mx-auto w-full">
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-6 custom-scrollbar">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-indigo/50">
                   <p className="font-handwriting text-3xl rotate-[-2deg] text-center max-w-md">
-                    Ask me anything! I will retrieve from the web or pinned documents.
+                    Ask me anything! I will retrieve from the web or uploaded documents.
                   </p>
                 </div>
               ) : (
@@ -128,10 +130,21 @@ export default function RAGChat() {
 
             <div className="border-t-2 border-dashed border-indigo/20 pt-4 mt-4">
                <div className="flex items-end gap-3">
+                 <div className="flex-none">
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleFileChange} 
+                      className="hidden" 
+                    />
+                    <RetroButton variant="secondary" icon="attach_file" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                      {uploading ? "..." : "Attach"}
+                    </RetroButton>
+                 </div>
                  <div className="flex-1">
                    <RetroInput 
                      label=""
-                     placeholder="Ask something..."
+                     placeholder="Ask something or upload a file..."
                      value={input}
                      onChange={(e) => setInput(e.target.value)}
                      onKeyDown={(e) => {

@@ -23,16 +23,16 @@ class Settings(BaseSettings):
 
     # Rate Limiting
     REDIS_URL: str = "redis://localhost:6379/0"
-    RATE_LIMIT_LOGIN: str = "5/minute"
-    RATE_LIMIT_REGISTER: str = "3/minute"
-    RATE_LIMIT_PASSWORD_RESET: str = "3/minute"
-    RATE_LIMIT_API: str = "60/minute"
-    RATE_LIMIT_AI_RIVER: str = "10/minute"
-    RATE_LIMIT_AI_OASIS: str = "10/minute"
-    RATE_LIMIT_PLANNER: str = "5/minute"
-    RATE_LIMIT_UPLOAD: str = "5/minute"
-    RATE_LIMIT_YOUTUBE: str = "5/minute"
-    RATE_LIMIT_INDEXING: str = "2/minute"
+    RATE_LIMIT_LOGIN: str = "500/minute"
+    RATE_LIMIT_REGISTER: str = "300/minute"
+    RATE_LIMIT_PASSWORD_RESET: str = "300/minute"
+    RATE_LIMIT_API: str = "600/minute"
+    RATE_LIMIT_AI_RIVER: str = "100/minute"
+    RATE_LIMIT_AI_OASIS: str = "100/minute"
+    RATE_LIMIT_PLANNER: str = "500/minute"
+    RATE_LIMIT_UPLOAD: str = "500/minute"
+    RATE_LIMIT_YOUTUBE: str = "500/minute"
+    RATE_LIMIT_INDEXING: str = "200/minute"
 
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True, extra="ignore")
 
