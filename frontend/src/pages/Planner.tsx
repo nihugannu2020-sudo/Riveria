@@ -1,5 +1,6 @@
 import React from 'react';
-import RetroWindow from '../components/RetroWindow';
+import ScrapbookPanel from '../components/ScrapbookPanel';
+import StickyNote from '../components/StickyNote';
 import RetroButton from '../components/RetroButton';
 
 export default function Planner() {
@@ -7,12 +8,11 @@ export default function Planner() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-indigo/20 pb-4">
         <div>
-          <div className="font-interface text-[10px] uppercase tracking-widest text-rust mb-2">Temporal Coordination</div>
-          <h1 className="font-display text-headline-lg text-indigo tracking-tight leading-none mb-2">
+          <h1 className="font-marker text-5xl text-indigo mb-2 rotate-[-1deg]">
             Study Planner
           </h1>
-          <p className="font-interface text-[11px] uppercase tracking-widest text-indigo/70">
-            Timetable alignment and structured study slots.
+          <p className="font-handwriting text-2xl text-indigo/70 rotate-[1deg]">
+            "Plan the work, work the plan."
           </p>
         </div>
         <div className="flex gap-2">
@@ -21,42 +21,59 @@ export default function Planner() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        <div className="xl:col-span-8 flex flex-col gap-6">
-          <RetroWindow title="TEMPORAL.GRID" icon="calendar_view_week">
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-indigo/20 pb-4">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start mt-4">
+        <div className="xl:col-span-7 flex flex-col gap-6">
+          <ScrapbookPanel title="My Schedule" tapePosition="top" rotation={-1}>
+            <div className="flex flex-col gap-6 p-4">
+              <div className="flex justify-between items-end border-b-2 border-indigo/20 pb-4">
                  <div>
-                    <div className="font-interface text-[9px] uppercase tracking-widest text-indigo/70 mb-1">Current Cycle</div>
-                    <div className="font-display text-[18px] text-indigo font-bold">Week 1</div>
+                    <div className="font-handwriting text-2xl text-indigo/70 mb-1">Week 1</div>
                  </div>
-                 <div className="flex gap-1 overflow-x-auto max-w-full pb-2 sm:pb-0">
+                 <div className="flex gap-2 overflow-x-auto max-w-full pb-2">
                     {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
-                        <button key={day} className={`flex flex-col items-center justify-center w-12 h-14 border border-indigo retro-inset transition-colors shrink-0 ${i === 0 ? 'bg-rust text-parchment' : 'bg-parchment text-indigo hover:bg-sand'}`}>
-                          <span className="font-interface text-[9px] uppercase tracking-widest font-bold">{day}</span>
+                        <button key={day} className={`font-marker text-lg px-3 py-1 rounded-sm transition-transform hover:scale-110 ${i === 0 ? 'bg-rust/20 text-rust underline decoration-wavy' : 'text-indigo'}`}>
+                          {day}
                         </button>
                     ))}
                  </div>
               </div>
 
-              <div className="flex flex-col gap-4 items-center justify-center py-12 text-indigo/50">
-                <span className="material-symbols-outlined text-[48px]">schedule</span>
-                <p className="font-interface text-[11px] uppercase tracking-widest">No active study slots.</p>
+              <div className="flex flex-col gap-4 items-center justify-center py-12 text-indigo/40">
+                <p className="font-handwriting text-2xl rotate-2">Nothing scheduled yet!</p>
               </div>
             </div>
-          </RetroWindow>
+          </ScrapbookPanel>
         </div>
 
-        <div className="xl:col-span-4 flex flex-col gap-6">
-          <RetroWindow title="CADENCE.METRICS" icon="monitoring">
-            <div className="flex flex-col gap-4">
-              <div className="bg-sand border border-indigo p-4 retro-inset">
-                <span className="font-interface text-[9px] uppercase tracking-widest text-indigo/70">Weekly Utilization</span>
-                <div className="font-display text-[24px] font-bold text-indigo my-2">0 hrs</div>
-                <div className="h-1.5 w-full border border-indigo bg-parchment"></div>
-              </div>
-            </div>
-          </RetroWindow>
+        <div className="xl:col-span-5 flex flex-col gap-6 relative">
+          <h3 className="font-marker text-3xl text-indigo mb-2 ml-4">To-Do List:</h3>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <StickyNote 
+              color="yellow" 
+              content="Review Chapter 4 (Thermodynamics) before Thursday!" 
+              rotation={-3} 
+              className="z-10"
+            />
+            <StickyNote 
+              color="pink" 
+              content="Draft essay outline for History." 
+              rotation={4} 
+              className="z-20 -ml-4 mt-8"
+            />
+            <StickyNote 
+              color="blue" 
+              content="Practice 5 calculus problems." 
+              rotation={-2} 
+              className="z-10"
+            />
+            <StickyNote 
+              color="green" 
+              content="Don't forget to ask Prof about the midterm." 
+              rotation={1} 
+              className="z-30 -ml-2 -mt-4"
+            />
+          </div>
         </div>
       </div>
     </div>

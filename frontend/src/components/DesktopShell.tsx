@@ -31,56 +31,44 @@ export default function DesktopShell({ children }: DesktopShellProps) {
       </div>
 
       {/* Global Status Bar (Top on mobile, left on desktop) */}
-      <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-indigo bg-sand/80 backdrop-blur-sm z-20 flex flex-col shrink-0 relative">
-        <PixelDecoration type="corner" className="absolute top-2 left-2" />
-        <PixelDecoration type="corner" className="absolute bottom-2 right-2 rotate-180" />
-        
-        <div className="p-4 border-b border-indigo flex items-center gap-3">
-          <div className="w-8 h-8 bg-rust border border-indigo flex items-center justify-center retro-inset">
-            <span className="material-symbols-outlined text-parchment text-[18px]">adjust</span>
-          </div>
-          <div>
-            <h1 className="font-display text-[16px] leading-tight font-bold text-indigo">SYSTEM BOOT</h1>
-            <div className="font-interface text-[9px] uppercase tracking-widest text-indigo/70">Arrakis OS v1.0</div>
-          </div>
+      {/* Binder / Notebook Edge (Left side) */}
+      <aside className="w-full md:w-64 bg-sand/40 border-r-4 border-double border-indigo/20 z-20 flex flex-col shrink-0 relative">
+        <div className="p-6 pb-2">
+          <h1 className="font-marker text-3xl text-indigo rotate-[-2deg] mb-1">My Notebook</h1>
+          <div className="font-handwriting text-xl text-indigo/70 rotate-[-1deg]">Property of Paul</div>
         </div>
         
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2 overflow-x-auto md:overflow-x-visible flex md:flex-col gap-2 md:gap-0 items-start">
+        {/* Navigation Tabs */}
+        <nav className="flex-1 mt-8 space-y-4 overflow-x-auto md:overflow-x-visible flex md:flex-col items-start px-2">
           {navItems.map((item) => {
             const isActive = location.pathname.startsWith(item.path);
             return (
               <Link 
                 key={item.path} 
                 to={item.path}
-                className={`flex items-center gap-2 px-3 py-2 w-full retro-border transition-colors group shrink-0 md:shrink-1 ${
+                className={`relative flex items-center gap-3 px-4 py-3 w-full transition-transform group shrink-0 md:shrink-1 scrapbook-shadow rounded-r-lg border-y border-r border-indigo/20 ${
                   isActive 
-                    ? 'bg-indigo text-parchment retro-inset' 
-                    : 'bg-parchment text-indigo hover:bg-sand'
+                    ? 'bg-parchment text-indigo translate-x-2' 
+                    : 'bg-sand text-indigo hover:bg-parchment/80'
                 }`}
+                style={{ 
+                  transformOrigin: 'left center',
+                }}
               >
-                <span className="material-symbols-outlined text-[16px]">{item.icon}</span>
-                <span className="font-interface text-[11px] font-bold tracking-wider">{item.name}</span>
-                {isActive && <div className="ml-auto w-1.5 h-1.5 bg-rust rounded-full" />}
+                <span className="material-symbols-outlined text-[20px] opacity-70">{item.icon}</span>
+                <span className="font-marker text-lg">{item.name.replace('.', ' ')}</span>
               </Link>
             );
           })}
         </nav>
         
-        <div className="p-4 border-t border-indigo hidden md:block">
-          <div className="font-interface text-[9px] text-indigo/60 uppercase tracking-widest mb-1">Coordinates</div>
-          <div className="font-interface text-[11px] font-bold">LAT 23.91 LONG 41.72</div>
-          <div className="flex items-center gap-2 mt-3">
-            <div className="w-2 h-2 bg-rust animate-pulse rounded-full" />
-            <span className="font-interface text-[10px] uppercase">Connection Established</span>
-          </div>
+        <div className="p-6 hidden md:block mt-auto text-center">
+          <div className="font-handwriting text-2xl text-indigo/60 rotate-2">"Fear is the mind-killer"</div>
         </div>
       </aside>
 
       {/* Main Desktop Area */}
-      <main className="flex-1 p-4 md:p-8 z-10 overflow-auto relative">
-        <PixelDecoration type="crosshair" className="absolute top-8 right-8 hidden lg:block" />
-        <PixelDecoration type="grid" className="absolute bottom-8 right-8 hidden lg:block" />
+      <main className="flex-1 p-4 md:p-8 z-10 overflow-auto relative bg-[radial-gradient(var(--color-sand)_1px,transparent_1px)] [background-size:20px_20px]">
         <div className="max-w-6xl mx-auto">
           {children}
         </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import RetroWindow from '../components/RetroWindow';
+import ScrapbookPanel from '../components/ScrapbookPanel';
 import RetroInput from '../components/RetroInput';
 import RetroButton from '../components/RetroButton';
 
@@ -26,19 +26,18 @@ export default function LLMChat() {
       </div>
 
       {/* Main Chat Interface */}
-      <RetroWindow title="MENTAT.COMM" icon="forum" className="flex-1 flex flex-col min-h-0" contentClassName="flex-1 flex flex-col p-0">
+      <ScrapbookPanel title="LLM Chat" tapePosition="top" rotation={0} className="flex-1 flex flex-col min-h-0">
         <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-6 custom-scrollbar">
           {/* Empty State Message */}
           <div className="flex flex-col items-center justify-center h-full text-indigo/50">
-            <span className="material-symbols-outlined text-[48px] mb-4">terminal</span>
-            <p className="font-interface text-[11px] uppercase tracking-widest text-center max-w-md">
-              Awaiting initialization sequence. Enter a prompt below to commence the dialectic.
+            <p className="font-handwriting text-3xl rotate-2">
+              Awaiting initialization sequence...
             </p>
           </div>
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-indigo p-4 bg-parchment shrink-0">
+        <div className="border-t-2 border-dashed border-indigo/20 pt-4 mt-4 shrink-0">
           <div className="flex items-end gap-3">
             <div className="flex-1">
               <RetroInput 
@@ -49,7 +48,7 @@ export default function LLMChat() {
             <RetroButton variant="primary" icon="send">Transmit</RetroButton>
           </div>
         </div>
-      </RetroWindow>
+      </ScrapbookPanel>
     </div>
   );
 }
